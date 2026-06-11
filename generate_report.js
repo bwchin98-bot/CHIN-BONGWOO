@@ -126,6 +126,29 @@ function t(key) {
   return translations[key] || key;
 }
 
+// 간결한 요약 생성 (1~2줄)
+function createCompactNewsItem(title, meta, url) {
+  return `<div class="news-item">
+    <h3><a href="${url}" target="_blank" style="color:#333;text-decoration:none;">${escapeHtml(title.substring(0, 80))}</a></h3>
+    <p style="font-size:0.9em;color:#666;">${escapeHtml(meta)}</p>
+    <a href="${url}" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div>`;
+}
+
+function createCompactModelItem(name, url, stats) {
+  return `<div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="${url}" target="_blank" style="text-decoration:none;">${escapeHtml(name)}</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">${escapeHtml(stats)}</div>
+  </div>`;
+}
+
+function createCompactEventItem(name, date, location, url) {
+  return `<div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="${url}" target="_blank" style="text-decoration:none;color:#333;">${escapeHtml(name)}</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 ${date} | 📍 ${location}</p>
+  </div>`;
+}
+
 function createNewsItem(title, meta, url, source) {
   return `<div class="news-item">
     <h3><a href="${url}" target="_blank" style="color:#333;text-decoration:none;">${escapeHtml(title)}</a></h3>
@@ -463,7 +486,7 @@ async function generateReport() {
   ]);
 
   const newsHtml = newsItems.length > 0
-    ? newsItems.map(item => createNewsItem(item.title, `Hacker News · ${item.score} upvotes`, item.url, 'Hacker News')).join('')
+    ? newsItems.slice(0, 5).map(item => createCompactNewsItem(item.title, `${item.score} upvotes`, item.url)).join('')
     : '<div class="empty-state">오늘 AI 관련 뉴스가 없습니다.</div>';
 
   const companiesHtml = companies.length > 0
@@ -480,14 +503,11 @@ async function generateReport() {
     : '<div class="empty-state">펀딩 뉴스를 찾을 수 없습니다.</div>';
 
   const modelsHtml = models.length > 0
-    ? models.map(m => `<div class="repo-item">
-    <h3><a href="${m.url}" target="_blank" style="color:#667eea;text-decoration:none;">${escapeHtml(m.name)}</a></h3>
-    <p>${escapeHtml(m.description)}</p>
-    <div class="stats">
-      <div class="stat">❤️ <strong>${Number(m.likes).toLocaleString()}</strong> likes</div>
-      <div class="stat">📥 <strong>${Number(m.downloads).toLocaleString()}</strong> downloads</div>
-    </div>
-  </div>`).join('')
+    ? models.slice(0, 5).map(m => createCompactModelItem(
+        m.name,
+        m.url,
+        `❤️ ${Number(m.likes).toLocaleString()} | 📥 ${Number(m.downloads).toLocaleString()}`
+      )).join('')
     : '<div class="empty-state">새로운 모델을 찾을 수 없습니다.</div>';
 
   const papersHtml = papers.length > 0
@@ -499,16 +519,7 @@ async function generateReport() {
     : '<div class="empty-state">트렌딩 저장소를 불러올 수 없습니다.</div>';
 
   const eventsHtml = events.length > 0
-    ? events.map(e => `<div class="news-item">
-    <h3>${escapeHtml(e.name)}</h3>
-    <p>${escapeHtml(e.description)}</p>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
-      <div style="color:#666;font-size:0.9em;">
-        📅 ${e.date} | 📍 ${e.location}
-      </div>
-      <a href="${e.url}" target="_blank">자세히 보기 →</a>
-    </div>
-  </div>`).join('')
+    ? events.slice(0, 5).map(e => createCompactEventItem(e.name, e.date, e.location, e.url)).join('')
     : '<div class="empty-state">예정된 행사가 없습니다.</div>';
 
   const now = new Date();
