@@ -88,37 +88,35 @@ function escapeHtml(text) {
 // 바탕화면 경로 감지
 function getDesktopPath() {
   const os = require('os');
-  const pathModule = require('path');
 
-  if (process.platform === 'win32') {
-    // Windows: C:\Users\{username}\Desktop
-    return pathModule.join(os.homedir(), 'Desktop');
-  } else if (process.platform === 'darwin') {
-    // macOS: /Users/{username}/Desktop
-    return pathModule.join(os.homedir(), 'Desktop');
-  } else {
-    // Linux: ~/Desktop
-    return pathModule.join(os.homedir(), 'Desktop');
-  }
+  // 모든 플랫폼에서 일관되게 Desktop 폴더 반환
+  const homeDir = os.homedir();
+  const desktopPath = path.join(homeDir, 'Desktop');
+
+  return desktopPath;
 }
 
 // 보고서 폴더 생성 및 파일 저장
 function saveReportToDesktop(html, filename) {
-  const pathModule = require('path');
-  const desktopPath = getDesktopPath();
-  const reportDir = pathModule.join(desktopPath, 'AI-Daily-Reports');
+  try {
+    const desktopPath = getDesktopPath();
+    const reportDir = path.join(desktopPath, 'AI-Daily-Reports');
 
-  // 디렉토리 생성
-  if (!fs.existsSync(reportDir)) {
-    fs.mkdirSync(reportDir, { recursive: true });
-    console.log(`   ✓ Desktop 폴더 생성: ${reportDir}`);
+    // 디렉토리 생성
+    if (!fs.existsSync(reportDir)) {
+      fs.mkdirSync(reportDir, { recursive: true });
+      console.log(`   ✓ Desktop 폴더 생성: ${reportDir}`);
+    }
+
+    const filePath = path.join(reportDir, filename);
+    fs.writeFileSync(filePath, html, 'utf8');
+    console.log(`   ✓ Desktop에 저장: ${filePath}`);
+
+    return filePath;
+  } catch (e) {
+    console.error(`   ✗ Desktop 저장 실패: ${e.message}`);
+    throw e;
   }
-
-  const filePath = pathModule.join(reportDir, filename);
-  fs.writeFileSync(filePath, html);
-  console.log(`   ✓ Desktop에 저장: ${filePath}`);
-
-  return filePath;
 }
 
 // 번역 함수
