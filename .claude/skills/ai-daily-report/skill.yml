@@ -1,8 +1,9 @@
 name: ai-daily-report
 displayName: AI Daily Report Generator
-description: Generate automated daily AI industry reports and push to GitHub
-version: 1.0.0
+description: Automated daily AI industry reports with GitHub Actions integration
+version: 2.0.0
 author: bwchin98-bot
+repository: https://github.com/bwchin98-bot/CHIN-BONGWOO
 
 trigger:
   - command: ai-report
@@ -17,24 +18,42 @@ config:
     - GITHUB_REPO
   optional:
     - SCHEDULE_TIME
-    - DATA_SOURCES
+    - GOOGLE_NEWS_API_KEY
+    - PRODUCT_HUNT_API_KEY
 
 scripts:
   setup: setup.sh
   run: run.js
 
 features:
-  - Breaking News (Hacker News API)
-  - Research Papers (arXiv API)
-  - GitHub Trending Repositories
-  - Automatic GitHub Push
-  - HTML Report Generation
-  - Archive Management
+  working:
+    - "✅ Breaking News (Hacker News API)"
+    - "✅ Research Papers (arXiv API)"
+    - "✅ GitHub Trending Repositories"
+    - "✅ Automatic GitHub Push"
+    - "✅ HTML Report Generation"
+    - "✅ Archive Management"
+    - "✅ GitHub Actions Automation"
+  planned:
+    - "⏳ Company Updates (Hacker News filtering)"
+    - "⏳ Funding & Investments (Product Hunt)"
+    - "⏳ New Models & Technologies (Hugging Face)"
+    - "⏳ Upcoming Events (Calendar integration)"
+
+issueTracking:
+  - number: 2
+    title: "보고서 일부 섹션에 데이터 없음"
+    status: "in-progress"
+    planned: true
 
 documentation:
   main: README.md
   quickStart: |
-    1. Run: /ai-report setup
+    1. Run: node .claude/skills/ai-daily-report/run.js setup
     2. Configure GitHub credentials
-    3. Run: /ai-report generate
+    3. Run: node .claude/skills/ai-daily-report/run.js generate
     4. Report saved to reports/ folder
+  roadmap: |
+    Phase 1 (Done): Breaking News, Papers, GitHub Trending
+    Phase 2 (Planned): Company Updates, Funding, New Models
+    Phase 3 (Future): Email alerts, Slack integration, Twitter posting

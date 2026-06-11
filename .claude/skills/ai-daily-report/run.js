@@ -19,7 +19,10 @@ const COMMANDS = {
   test: 'Test mode (dry run)',
   status: 'Show current status',
   config: 'Show configuration',
-  logs: 'Show recent logs'
+  logs: 'Show recent logs',
+  roadmap: 'Show development roadmap',
+  issues: 'Show active issues',
+  version: 'Show version information'
 };
 
 function printHelp() {
@@ -185,6 +188,76 @@ function showLogs() {
   }
 }
 
+function showRoadmap() {
+  console.log('\n🗺️  Development Roadmap\n');
+
+  console.log('Phase 1: MVP ✅');
+  console.log('  [x] Breaking News (Hacker News)');
+  console.log('  [x] Research Papers (arXiv)');
+  console.log('  [x] GitHub Trending Repositories');
+  console.log('  [x] HTML Report Generation');
+  console.log('  [x] GitHub Actions Integration');
+  console.log('');
+
+  console.log('Phase 2: Core Features 🔄 (Issue #2)');
+  console.log('  [ ] Company Updates (Hacker News filtering)');
+  console.log('  [ ] Funding & Investments (Product Hunt API)');
+  console.log('  [ ] New Models & Technologies (Hugging Face)');
+  console.log('  [ ] Upcoming Events (Calendar)');
+  console.log('');
+
+  console.log('Phase 3: Advanced Features');
+  console.log('  [ ] Email notifications');
+  console.log('  [ ] Slack integration');
+  console.log('  [ ] Twitter auto-posting');
+  console.log('  [ ] Discord webhooks');
+  console.log('');
+
+  console.log('Phase 4: Expansion');
+  console.log('  [ ] Multi-language support');
+  console.log('  [ ] Custom filters');
+  console.log('  [ ] Dashboard website');
+  console.log('');
+}
+
+function showIssues() {
+  console.log('\n🐛 Active Issues\n');
+
+  console.log('Issue #2: Missing data in report sections');
+  console.log('  Status: In Progress');
+  console.log('  Priority: High');
+  console.log('  Affected: 4 sections');
+  console.log('');
+  console.log('  Details:');
+  console.log('    ❌ Company Updates');
+  console.log('    ❌ Funding & Investments');
+  console.log('    ❌ New Models & Technologies');
+  console.log('    ❌ Upcoming Events');
+  console.log('');
+  console.log('  Planned Solutions:');
+  console.log('    1. Company Updates: Filter Hacker News for major AI companies');
+  console.log('    2. Funding: Integrate Product Hunt API');
+  console.log('    3. New Models: Use Hugging Face Models API');
+  console.log('    4. Events: Manual or Calendar API integration');
+  console.log('');
+  console.log('  URL: https://github.com/bwchin98-bot/CHIN-BONGWOO/issues/2');
+  console.log('');
+}
+
+function showVersion() {
+  console.log('\n📦 Version Information\n');
+  console.log('  Skill: AI Daily Report Generator');
+  console.log('  Version: 2.0.0');
+  console.log('  Status: Active Development');
+  console.log('');
+  console.log('  Current Phase: Phase 2 (Core Features)');
+  console.log('  Active Issues: 1 (#2)');
+  console.log('');
+  console.log('  Repository: https://github.com/bwchin98-bot/CHIN-BONGWOO');
+  console.log('  Author: bwchin98-bot');
+  console.log('');
+}
+
 // Main
 const command = process.argv[2];
 
@@ -211,6 +284,15 @@ switch (command) {
     break;
   case 'logs':
     showLogs();
+    break;
+  case 'roadmap':
+    showRoadmap();
+    break;
+  case 'issues':
+    showIssues();
+    break;
+  case 'version':
+    showVersion();
     break;
   default:
     console.error(`❌ Unknown command: ${command}\n`);

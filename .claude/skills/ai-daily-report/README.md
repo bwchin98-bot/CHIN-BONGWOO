@@ -4,6 +4,7 @@
 
 ## ✨ 기능
 
+### ✅ 현재 작동 중
 - **📰 Breaking News**: Hacker News에서 AI 관련 뉴스 5개 자동 수집
 - **📚 Research Papers**: arXiv에서 최신 AI 논문 5개 자동 수집
 - **🔥 Trending Repos**: GitHub에서 트렌딩 AI 저장소 5개 자동 수집
@@ -11,6 +12,12 @@
 - **🔄 자동 푸시**: GitHub에 자동으로 커밋 및 푸시
 - **📑 아카이브**: 과거 보고서 목록 자동 생성
 - **⏰ 자동화**: GitHub Actions로 매일 자동 실행
+
+### ⏳ 개발 중 (Issue #2 참조)
+- **💼 Company Updates**: 대형 AI 기업 뉴스 수집
+- **💰 Funding & Investments**: AI 스타트업 펀딩 정보
+- **🤖 New Models & Technologies**: 최신 AI 모델 출시 정보
+- **📅 Upcoming Events**: AI 컨퍼런스 일정
 
 ## 🚀 빠른 시작
 
@@ -132,21 +139,48 @@ your-repo/
 - GitHub Actions 로그 확인: Actions 탭 → 최근 실행 → 로그
 - 데이터 수집 API 상태 확인 (Hacker News, arXiv 등)
 
-## 📈 다음 단계
+## 🗺️ 로드맵
 
-### Phase 2: 고급 기능
-- [ ] Product Hunt API 통합 (Funding)
-- [ ] Google News API 통합 (Company Updates)
-- [ ] Hugging Face API 통합 (New Models)
+### Phase 1: MVP ✅ (완료)
+- [x] Breaking News (Hacker News)
+- [x] Research Papers (arXiv)
+- [x] GitHub Trending Repositories
+- [x] HTML Report Generation
+- [x] GitHub Actions Integration
+- [x] Archive Management
+
+### Phase 2: 핵심 기능 (진행 중) - Issue #2
+- [ ] Company Updates (Hacker News 필터링)
+- [ ] Funding & Investments (Product Hunt API)
+- [ ] New Models & Technologies (Hugging Face API)
+- [ ] Upcoming Events (Calendar integration)
+
+### Phase 3: 고급 기능
 - [ ] Email 알림
 - [ ] Slack 연동
 - [ ] Twitter 자동 포스팅
+- [ ] Discord 웹훅
 
-### Phase 3: 확장
+### Phase 4: 확장
 - [ ] 여러 언어 지원
 - [ ] 커스텀 필터링
 - [ ] 사용자 정의 섹션
 - [ ] 대시보드 웹사이트
+
+## 📋 활성 이슈
+
+### Issue #2: 보고서 일부 섹션에 데이터 없음
+**상태**: In Progress  
+**우선순위**: High  
+**영향**: 4개 섹션 (Company Updates, Funding, New Models, Events)
+
+**계획된 해결책**:
+1. **Company Updates**: Hacker News에서 "OpenAI", "Google", "Anthropic" 등 필터링
+2. **Funding & Investments**: Product Hunt API로 AI 펀딩 정보 수집
+3. **New Models & Technologies**: Hugging Face Models API 통합
+4. **Upcoming Events**: 주요 AI 컨퍼런스 수동 또는 Calendar API
+
+자세한 내용: [GitHub Issue #2](https://github.com/bwchin98-bot/CHIN-BONGWOO/issues/2)
 
 ## 📞 지원
 
