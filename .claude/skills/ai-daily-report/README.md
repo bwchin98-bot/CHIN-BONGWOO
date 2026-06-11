@@ -2,7 +2,7 @@
 
 자동으로 AI 업계 동향을 수집하여 매일 HTML 보고서를 생성하고 GitHub에 올려주는 Claude Code 스킬입니다.
 
-**v3.2.0** | GitHub Actions v5 업그레이드 | Node.js 24 완벽 호환 ✅
+**v4.0.0 - Final Release** | Production Ready ✅ | GitHub Actions v5 | Node.js 24
 
 ## ✨ 기능
 

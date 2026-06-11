@@ -249,8 +249,8 @@ function showIssues() {
 function showVersion() {
   console.log('\n📦 Version Information\n');
   console.log('  Skill: AI Daily Report Generator');
-  console.log('  Version: 3.2.0');
-  console.log('  Status: Production Ready ✅');
+  console.log('  Version: 4.0.0');
+  console.log('  Status: Production Ready - Final Release ✅');
   console.log('');
   console.log('  Features:');
   console.log('    ✅ 7 Sections (News, Papers, Repos, Models, Company, Funding, Events)');
