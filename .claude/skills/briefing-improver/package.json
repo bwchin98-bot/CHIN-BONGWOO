@@ -1,0 +1,25 @@
+{
+  "name": "briefing-improver",
+  "version": "1.0.0",
+  "description": "Meta-skill that improves AI Daily Report via issue detection, fixing, and documentation optimization",
+  "main": "src/index.js",
+  "author": "bwchin98-bot",
+  "license": "MIT",
+  "scripts": {
+    "scan": "node src/index.js scan",
+    "fix": "node src/index.js fix",
+    "optimize": "node src/index.js optimize",
+    "run": "node src/index.js run",
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "briefing-improver",
+    "meta-skill",
+    "project-improvement",
+    "issue-automation",
+    "documentation-optimization"
+  ],
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}

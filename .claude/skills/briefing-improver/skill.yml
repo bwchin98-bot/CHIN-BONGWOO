@@ -1,0 +1,42 @@
+name: briefing-improver
+displayName: Briefing Improver
+description: Meta-skill that improves AI Daily Report via issue detection, fixing, and doc optimization
+version: 1.0.0
+author: bwchin98-bot
+repository: https://github.com/bwchin98-bot/CHIN-BONGWOO
+status: Active
+
+trigger:
+  - command: /briefing-improver
+  - command: /improve
+  - command: briefing-improver
+
+config:
+  required:
+    - GITHUB_USER
+    - GITHUB_TOKEN
+    - GITHUB_REPO
+  optional:
+    - SCAN_DEPTH
+    - AUTO_FIX
+
+scripts:
+  main: src/index.js
+  issue_writer: src/issue-writer.js
+  issue_runner: src/issue-runner.js
+  doc_optimizer: src/doc-optimizer.js
+
+features:
+  phase1:
+    - "✅ Issue Writer: Detect weaknesses → Create GitHub Issues"
+    - "✅ Issue Runner: Read issues → Fix → Close"
+    - "✅ Doc Optimizer: Analyze → Suggest improvements"
+    - "✅ Pipeline: Run all three in sequence"
+
+documentation:
+  main: README.md
+  quickStart: |
+    /briefing-improver scan      # Scan weaknesses
+    /briefing-improver fix       # Fix issues
+    /briefing-improver optimize  # Optimize docs
+    /briefing-improver run       # All-in-one
