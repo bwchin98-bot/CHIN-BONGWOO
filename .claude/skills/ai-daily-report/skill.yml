@@ -7,9 +7,13 @@ repository: https://github.com/bwchin98-bot/CHIN-BONGWOO
 status: Production Ready - Final Release ✅
 
 trigger:
-  - command: ai-report
-  - command: generate-report
   - command: /ai-report
+  - command: /generate-report
+  - command: ai-report
+
+aliases:
+  - ai-daily-report
+  - report-generator
 
 config:
   required:
@@ -23,8 +27,12 @@ config:
     - PRODUCT_HUNT_API_KEY
 
 scripts:
-  setup: setup.sh
-  run: run.js
+  main: src/index.js
+  setup: scripts/setup.sh
+  cli: src/cli.js
+  config: config/defaults.js
+
+entry_point: src/index.js
 
 features:
   phase1:
@@ -63,12 +71,15 @@ issueTracking:
 
 documentation:
   main: README.md
+  complete: docs/DOCUMENTATION.md
+  changelog: docs/CHANGELOG.md
   quickStart: |
-    1. Run: node .claude/skills/ai-daily-report/run.js setup
+    1. Run: /ai-report setup
     2. Configure GitHub credentials
-    3. Run: node .claude/skills/ai-daily-report/run.js generate
-    4. Report saved to reports/ folder
+    3. Run: /ai-report generate
+    4. Reports saved to reports/ and Desktop/AI-Daily-Reports/
   roadmap: |
     Phase 1 (Done): Breaking News, Papers, GitHub Trending
-    Phase 2 (Planned): Company Updates, Funding, New Models
-    Phase 3 (Future): Email alerts, Slack integration, Twitter posting
+    Phase 2 (Done): Company Updates, Funding, New Models, Events
+    Phase 3 (Done): Korean Localization, Compact Format, Desktop, GitHub Actions v5
+    Phase 4 (Planned): Email, Slack, Twitter, Web Dashboard

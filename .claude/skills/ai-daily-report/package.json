@@ -1,0 +1,47 @@
+{
+  "name": "ai-daily-report-skill",
+  "version": "4.0.0",
+  "description": "Claude Code Skill - Automated daily AI industry reports with Korean localization",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "author": "bwchin98-bot",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bwchin98-bot/CHIN-BONGWOO.git"
+  },
+  "keywords": [
+    "claude-code",
+    "skill",
+    "ai",
+    "automation",
+    "github-actions",
+    "report-generator"
+  ],
+  "scripts": {
+    "start": "node src/index.js",
+    "generate": "node src/index.js generate",
+    "setup": "node src/index.js setup",
+    "test": "node src/index.js test",
+    "version": "node src/index.js version",
+    "help": "node src/index.js help"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0"
+  },
+  "files": [
+    "src/",
+    "scripts/",
+    "templates/",
+    "config/",
+    "docs/",
+    "README.md",
+    "DOCUMENTATION.md",
+    "CHANGELOG.md",
+    "skill.yml",
+    "package.json"
+  ],
+  "devDependencies": {},
+  "dependencies": {}
+}
