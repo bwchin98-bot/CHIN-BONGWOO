@@ -1,0 +1,40 @@
+name: ai-daily-report
+displayName: AI Daily Report Generator
+description: Generate automated daily AI industry reports and push to GitHub
+version: 1.0.0
+author: bwchin98-bot
+
+trigger:
+  - command: ai-report
+  - command: generate-report
+  - command: /ai-report
+
+config:
+  required:
+    - GITHUB_USER
+    - GITHUB_EMAIL
+    - GITHUB_TOKEN
+    - GITHUB_REPO
+  optional:
+    - SCHEDULE_TIME
+    - DATA_SOURCES
+
+scripts:
+  setup: setup.sh
+  run: run.js
+
+features:
+  - Breaking News (Hacker News API)
+  - Research Papers (arXiv API)
+  - GitHub Trending Repositories
+  - Automatic GitHub Push
+  - HTML Report Generation
+  - Archive Management
+
+documentation:
+  main: README.md
+  quickStart: |
+    1. Run: /ai-report setup
+    2. Configure GitHub credentials
+    3. Run: /ai-report generate
+    4. Report saved to reports/ folder
