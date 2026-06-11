@@ -16,6 +16,46 @@ const CONFIG = {
   output: {
     dir: 'reports',
     filename: `report-${new Date().toISOString().split('T')[0]}.html`
+  },
+  language: process.env.REPORT_LANGUAGE || 'ko', // 'ko' or 'en'
+  saveToDesktop: process.env.REPORT_DESKTOP_SAVE !== 'false',
+};
+
+// 한글/영문 번역 맵
+const TRANSLATIONS = {
+  ko: {
+    title: 'AI 업계 일일 동향 보고서',
+    summary: '📊 오늘의 요약',
+    breakingNews: '🔥 주요 뉴스',
+    newModels: '🤖 신규 모델 및 기술',
+    companyUpdates: '💼 기업 뉴스',
+    funding: '💰 펀딩 및 투자',
+    papers: '📄 주목할 논문',
+    trending: '🔥 GitHub 인기 저장소',
+    events: '📅 예정된 행사',
+    readMore: '자세히 보기 →',
+    source: '출처',
+    generatedOn: '생성일',
+    viewOnGithub: 'GitHub에서 보기',
+    lastUpdated: '최종 업데이트',
+    days: ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+  },
+  en: {
+    title: 'AI Industry Daily Report',
+    summary: '📊 Today\'s Summary',
+    breakingNews: '🔥 Breaking News',
+    newModels: '🤖 New Models & Technologies',
+    companyUpdates: '💼 Company Updates',
+    funding: '💰 Funding & Investments',
+    papers: '📄 Notable Research Papers',
+    trending: '🔥 Trending AI Repositories',
+    events: '📅 Upcoming Events',
+    readMore: 'Read More →',
+    source: 'Source',
+    generatedOn: 'Generated on',
+    viewOnGithub: 'View on GitHub',
+    lastUpdated: 'Last updated',
+    days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   }
 };
 
@@ -43,6 +83,49 @@ async function fetchJson(url, headers = {}) {
 function escapeHtml(text) {
   if (!text) return '';
   return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+// 바탕화면 경로 감지
+function getDesktopPath() {
+  const os = require('os');
+  const pathModule = require('path');
+
+  if (process.platform === 'win32') {
+    // Windows: C:\Users\{username}\Desktop
+    return pathModule.join(os.homedir(), 'Desktop');
+  } else if (process.platform === 'darwin') {
+    // macOS: /Users/{username}/Desktop
+    return pathModule.join(os.homedir(), 'Desktop');
+  } else {
+    // Linux: ~/Desktop
+    return pathModule.join(os.homedir(), 'Desktop');
+  }
+}
+
+// 보고서 폴더 생성 및 파일 저장
+function saveReportToDesktop(html, filename) {
+  const pathModule = require('path');
+  const desktopPath = getDesktopPath();
+  const reportDir = pathModule.join(desktopPath, 'AI-Daily-Reports');
+
+  // 디렉토리 생성
+  if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+    console.log(`   ✓ Desktop 폴더 생성: ${reportDir}`);
+  }
+
+  const filePath = pathModule.join(reportDir, filename);
+  fs.writeFileSync(filePath, html);
+  console.log(`   ✓ Desktop에 저장: ${filePath}`);
+
+  return filePath;
+}
+
+// 번역 함수
+function t(key) {
+  const lang = CONFIG.language;
+  const translations = TRANSLATIONS[lang] || TRANSLATIONS['en'];
+  return translations[key] || key;
 }
 
 function createNewsItem(title, meta, url, source) {
@@ -432,8 +515,7 @@ async function generateReport() {
 
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0];
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  const dayOfWeek = days[now.getDay()];
+  const dayOfWeek = t('days')[now.getDay()];
   const timeStr = now.toISOString().split('T')[1].split('.')[0];
 
   const totalItems = newsItems.length + companies.length + fundings.length + models.length + papers.length + repos.length + events.length;
@@ -467,7 +549,21 @@ async function generateReport() {
 
   const outputPath = path.join(outputDir, CONFIG.output.filename);
   fs.writeFileSync(outputPath, html);
-  console.log(`\n✅ 보고서 생성: ${outputPath}`);
+  console.log(`\n✅ GitHub 저장소에 저장: ${outputPath}`);
+
+  // Desktop에도 저장
+  let desktopPath = null;
+  if (CONFIG.saveToDesktop) {
+    try {
+      const filename = CONFIG.language === 'ko'
+        ? `${dateStr}-AI업계동향보고서.html`
+        : `report-${dateStr}.html`;
+      desktopPath = saveReportToDesktop(html, filename);
+      console.log(`✅ Desktop에도 저장됨`);
+    } catch (e) {
+      console.warn(`⚠️  Desktop 저장 실패: ${e.message}`);
+    }
+  }
 
   // 인덱스 페이지 갱신
   const reportFiles = fs.readdirSync(outputDir).filter(f => f.endsWith('.html'));
@@ -498,11 +594,13 @@ async function pushToGithub(reportPath) {
 }
 
 async function main() {
-  console.log('[시작] GitHub 환경 변수 확인:');
+  console.log('[시작] 환경 변수 확인:');
   console.log(`  GITHUB_USER: ${process.env.GITHUB_USER || '(없음)'}`);
   console.log(`  GITHUB_EMAIL: ${process.env.GITHUB_EMAIL || '(없음)'}`);
   console.log(`  GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? '✓ 있음' : '✗ 없음'}`);
-  console.log(`  GITHUB_REPO: ${process.env.GITHUB_REPO || '(없음)'}\n`);
+  console.log(`  GITHUB_REPO: ${process.env.GITHUB_REPO || '(없음)'}`);
+  console.log(`  REPORT_LANGUAGE: ${CONFIG.language === 'ko' ? '한글 🇰🇷' : 'English 🇺🇸'}`);
+  console.log(`  REPORT_DESKTOP_SAVE: ${CONFIG.saveToDesktop ? '✓ 활성화' : '✗ 비활성화'}\n`);
 
   const reportPath = await generateReport();
   await pushToGithub(reportPath);
