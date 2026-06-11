@@ -5,9 +5,6 @@ on:
     - cron: '0 9 * * *'   # 매일 09:00 UTC (한국 오후 6시)
   workflow_dispatch:        # 수동 실행 가능
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   generate-report:
     runs-on: ubuntu-latest
@@ -22,6 +19,7 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '24'
+          cache: false
 
       - name: Generate report
         run: node generate_report.js
