@@ -1,0 +1,60 @@
+name: Generate AI Daily Report
+
+on:
+  schedule:
+    # 매일 09:00 UTC (한국 시간 오후 6시)에 실행
+    - cron: '0 9 * * *'
+  # 수동 실행 옵션
+  workflow_dispatch:
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 🔧 Install dependencies
+        run: |
+          npm install axios cheerio dotenv
+
+      - name: 🚀 Generate report
+        run: node generate_report.js
+        env:
+          GITHUB_USER: ${{ secrets.GITHUB_USER }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_EMAIL: ${{ secrets.GITHUB_EMAIL }}
+          GITHUB_REPO: ai-daily-report
+
+      - name: 📤 Commit and push changes
+        run: |
+          git config user.email "${{ secrets.GITHUB_EMAIL }}"
+          git config user.name "AI Report Bot"
+          
+          # 변경사항 확인
+          if [ -n "$(git status --porcelain)" ]; then
+            git add reports/
+            git add index.html
+            git commit -m "chore: AI Daily Report - $(date -u +%Y-%m-%d)"
+            git push
+          else
+            echo "No changes to commit"
+          fi
+
+      - name: ✅ Upload artifact
+        uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: ai-report
+          path: reports/
+          retention-days: 30

@@ -1,0 +1,22 @@
+{
+  "name": "ai-daily-report",
+  "version": "1.0.0",
+  "description": "Automated daily AI industry report generator",
+  "main": "generate_report.js",
+  "scripts": {
+    "start": "node generate_report.js",
+    "test": "node generate_report.js --dry-run"
+  },
+  "keywords": ["ai", "report", "automation", "github"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
