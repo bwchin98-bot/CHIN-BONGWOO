@@ -1,0 +1,41 @@
+name: Generate AI Daily Report
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 매일 09:00 UTC (한국 오후 6시)
+  workflow_dispatch:        # 수동 실행 가능
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate report
+        run: node generate_report.js
+        env:
+          GITHUB_USER: ${{ secrets.REPORT_GITHUB_USER }}
+          GITHUB_TOKEN: ${{ secrets.REPORT_GITHUB_TOKEN }}
+          GITHUB_EMAIL: ${{ secrets.REPORT_GITHUB_EMAIL }}
+          GITHUB_REPO: CHIN-BONGWOO
+
+      - name: Commit and push report
+        run: |
+          git config user.email "${{ secrets.REPORT_GITHUB_EMAIL }}"
+          git config user.name "AI Report Bot"
+          git add reports/ index.html || true
+          if git diff --cached --quiet; then
+            echo "변경사항 없음"
+          else
+            git commit -m "report: AI Daily Report $(date -u +%Y-%m-%d)"
+            git push
+          fi

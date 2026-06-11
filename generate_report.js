@@ -3,15 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const http = require('http');
 const { execSync } = require('child_process');
 
-// ======================== 설정 ========================
 const CONFIG = {
   github: {
-    user: process.env.GITHUB_USER || 'your-username',
-    token: process.env.GITHUB_TOKEN, // GitHub Personal Access Token
-    repo: process.env.GITHUB_REPO || 'ai-daily-report',
-    email: process.env.GITHUB_EMAIL || 'your-email@example.com',
+    user: process.env.GITHUB_USER || 'bwchin98-bot',
+    token: process.env.GITHUB_TOKEN,
+    repo: process.env.GITHUB_REPO || 'CHIN-BONGWOO',
+    email: process.env.GITHUB_EMAIL || 'bwchin98@gmail.com',
   },
   output: {
     dir: 'reports',
@@ -19,109 +19,91 @@ const CONFIG = {
   }
 };
 
-// ======================== 유틸리티 함수 ========================
-
-// HTTPS 요청 함수
-function fetchJson(url, headers = {}) {
+function fetchUrl(url, headers = {}) {
   return new Promise((resolve, reject) => {
-    https.get(url, { headers }, (res) => {
+    const lib = url.startsWith('https') ? https : http;
+    const req = lib.get(url, { headers: { 'User-Agent': 'AI-Report-Bot/1.0', ...headers } }, (res) => {
+      if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+        return fetchUrl(res.headers.location, headers).then(resolve).catch(reject);
+      }
       let data = '';
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => {
-        try {
-          resolve(JSON.parse(data));
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }).on('error', reject);
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => resolve(data));
+    });
+    req.on('error', reject);
+    req.setTimeout(10000, () => { req.destroy(); reject(new Error('timeout')); });
   });
 }
 
-// 템플릿 렌더링
-function renderTemplate(template, variables) {
-  let result = template;
-  Object.entries(variables).forEach(([key, value]) => {
-    result = result.replace(new RegExp(`{{${key}}}`, 'g'), value);
-  });
-  return result;
-}
-
-// HTML 아이템 생성
-function createNewsItem(title, description, url, source) {
-  return `
-    <div class="news-item">
-      <h3>${escapeHtml(title)}</h3>
-      <p>${escapeHtml(description || 'No description available')}</p>
-      <a href="${url}" target="_blank">Read More →</a>
-      <div class="source">Source: ${source}</div>
-    </div>
-  `;
-}
-
-function createPaperItem(title, authors, abstract, url, date) {
-  return `
-    <div class="paper-item">
-      <h3>${escapeHtml(title)}</h3>
-      <div class="authors">${authors.join(', ')}</div>
-      <p>${escapeHtml(abstract.substring(0, 200))}...</p>
-      <div class="tags">
-        <span class="tag">${date}</span>
-        <a href="${url}" target="_blank" style="color: #667eea; font-weight: 600;">View Paper →</a>
-      </div>
-    </div>
-  `;
-}
-
-function createRepoItem(name, url, description, stars, language) {
-  return `
-    <div class="repo-item">
-      <h3><a href="${url}" target="_blank" style="color: #667eea; text-decoration: none;">${name}</a></h3>
-      <p>${escapeHtml(description || 'No description')}</p>
-      <div class="stats">
-        <div class="stat">⭐ <strong>${stars}</strong> stars</div>
-        ${language ? `<div class="stat">📝 <strong>${language}</strong></div>` : ''}
-      </div>
-    </div>
-  `;
+async function fetchJson(url, headers = {}) {
+  const text = await fetchUrl(url, headers);
+  return JSON.parse(text);
 }
 
 function escapeHtml(text) {
   if (!text) return '';
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  };
-  return text.replace(/[&<>"']/g, m => map[m]);
+  return text.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 }
 
-// ======================== 데이터 수집 ========================
+function createNewsItem(title, meta, url, source) {
+  return `<div class="news-item">
+    <h3><a href="${url}" target="_blank" style="color:#333;text-decoration:none;">${escapeHtml(title)}</a></h3>
+    <p>${escapeHtml(meta)}</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="${url}" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: ${source}</div>
+    </div>
+  </div>`;
+}
 
+function createPaperItem(title, authors, abstract, url, date) {
+  return `<div class="paper-item">
+    <h3>${escapeHtml(title)}</h3>
+    <div class="authors">${escapeHtml(authors)}</div>
+    <p>${escapeHtml(abstract.substring(0, 250))}...</p>
+    <div class="tags">
+      <span class="tag">${date}</span>
+      <a href="${url}" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div>`;
+}
+
+function createRepoItem(name, url, description, stars, language) {
+  return `<div class="repo-item">
+    <h3><a href="${url}" target="_blank" style="color:#667eea;text-decoration:none;">${escapeHtml(name)}</a></h3>
+    <p>${escapeHtml(description || '설명 없음')}</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>${Number(stars).toLocaleString()}</strong> stars</div>
+      ${language ? `<div class="stat">📝 <strong>${escapeHtml(language)}</strong></div>` : ''}
+    </div>
+  </div>`;
+}
+
+// Hacker News에서 AI 관련 뉴스 수집
 async function fetchHackerNewsAI() {
   try {
-    console.log('📰 Fetching Hacker News...');
+    console.log('📰 Hacker News 수집 중...');
     const topStories = await fetchJson('https://hacker-news.firebaseio.com/v0/topstories.json');
+    const AI_KEYWORDS = ['ai', 'machine learning', 'neural', 'gpt', 'llm', 'transformer',
+      'deep learning', 'nlp', 'openai', 'anthropic', 'gemini', 'claude', 'mistral',
+      'diffusion', 'reinforcement', 'chatgpt', 'language model', 'stable diffusion'];
     const stories = [];
-    
-    for (let i = 0; i < Math.min(30, topStories.length); i++) {
-      const story = await fetchJson(`https://hacker-news.firebaseio.com/v0/item/${topStories[i]}.json`);
-      const title = (story.title || '').toLowerCase();
-      
-      // AI 관련 키워드 필터링
-      if (['ai', 'machine learning', 'neural', 'gpt', 'llm', 'transformer', 'model', 'algorithm', 'deep learning', 'nlp'].some(k => title.includes(k))) {
-        stories.push({
-          title: story.title,
-          url: story.url || `https://news.ycombinator.com/item?id=${story.id}`,
-          score: story.score,
-          points: story.score
-        });
-        if (stories.length >= 5) break;
-      }
+
+    for (let i = 0; i < Math.min(50, topStories.length) && stories.length < 5; i++) {
+      try {
+        const story = await fetchJson(`https://hacker-news.firebaseio.com/v0/item/${topStories[i]}.json`);
+        if (!story || !story.title) continue;
+        const titleLow = story.title.toLowerCase();
+        if (AI_KEYWORDS.some(k => titleLow.includes(k))) {
+          stories.push({
+            title: story.title,
+            url: story.url || `https://news.ycombinator.com/item?id=${story.id}`,
+            score: story.score || 0,
+          });
+        }
+      } catch (e) { /* skip */ }
     }
-    
+    console.log(`  → ${stories.length}개 수집`);
     return stories;
   } catch (e) {
     console.error('❌ HN 오류:', e.message);
@@ -129,16 +111,28 @@ async function fetchHackerNewsAI() {
   }
 }
 
+// arXiv에서 최신 AI 논문 수집 (XML 파싱)
 async function fetchArxivPapers() {
   try {
-    console.log('📚 Fetching arXiv papers...');
-    const response = await fetchJson(
-      'https://export.arxiv.org/api/query?search_query=cat:cs.AI+AND+submittedDate:[202401010000+TO+202412312359]&start=0&max_results=10&sortBy=submittedDate&sortOrder=descending'
+    console.log('📚 arXiv 논문 수집 중...');
+    const xml = await fetchUrl(
+      'https://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending'
     );
-    
-    // XML 응답이므로 JSON 변환 필요
+
     const papers = [];
-    // 실제 구현시 xml2json 라이브러리 사용
+    const entries = xml.match(/<entry>([\s\S]*?)<\/entry>/g) || [];
+
+    for (const entry of entries.slice(0, 5)) {
+      const title = (entry.match(/<title>([\s\S]*?)<\/title>/) || [])[1]?.replace(/\s+/g, ' ').trim() || '';
+      const abstract = (entry.match(/<summary>([\s\S]*?)<\/summary>/) || [])[1]?.replace(/\s+/g, ' ').trim() || '';
+      const url = (entry.match(/<id>([\s\S]*?)<\/id>/) || [])[1]?.trim() || '';
+      const published = (entry.match(/<published>([\s\S]*?)<\/published>/) || [])[1]?.substring(0, 10) || '';
+      const authorMatches = entry.match(/<name>([\s\S]*?)<\/name>/g) || [];
+      const authors = authorMatches.slice(0, 3).map(a => a.replace(/<\/?name>/g, '').trim()).join(', ');
+
+      if (title) papers.push({ title, abstract, url, date: published, authors });
+    }
+    console.log(`  → ${papers.length}개 수집`);
     return papers;
   } catch (e) {
     console.error('❌ arXiv 오류:', e.message);
@@ -146,20 +140,27 @@ async function fetchArxivPapers() {
   }
 }
 
+// GitHub API로 AI 관련 인기 저장소 수집
 async function fetchGithubTrending() {
   try {
-    console.log('🔥 Fetching GitHub trending...');
-    // GitHub API를 직접 사용하려면 리포 필요
-    // 여기서는 샘플 데이터 반환
-    const repos = [
-      {
-        name: 'ollama/ollama',
-        url: 'https://github.com/ollama/ollama',
-        description: 'Get up and running with large language models',
-        stars: '45000',
-        language: 'Go'
-      }
-    ];
+    console.log('🔥 GitHub 트렌딩 수집 중...');
+    const headers = CONFIG.github.token
+      ? { Authorization: `token ${CONFIG.github.token}` }
+      : {};
+
+    const data = await fetchJson(
+      'https://api.github.com/search/repositories?q=topic:artificial-intelligence+topic:machine-learning&sort=stars&order=desc&per_page=5',
+      headers
+    );
+
+    const repos = (data.items || []).slice(0, 5).map(r => ({
+      name: r.full_name,
+      url: r.html_url,
+      description: r.description,
+      stars: r.stargazers_count,
+      language: r.language,
+    }));
+    console.log(`  → ${repos.length}개 수집`);
     return repos;
   } catch (e) {
     console.error('❌ GitHub 오류:', e.message);
@@ -167,59 +168,80 @@ async function fetchGithubTrending() {
   }
 }
 
-async function generateSummary(newsItems) {
-  // AI 기반 요약 (또는 간단한 템플릿)
-  const summaries = [
-    `오늘은 ${newsItems.length}개의 주요 AI 업계 뉴스가 있습니다. 최신 모델과 연구 동향을 확인하세요.`,
-    `AI 분야의 빠른 변화가 계속되고 있습니다. ${newsItems.length}개의 주목할 뉴스를 정리했습니다.`,
-    `오늘의 AI 업계 동향: ${newsItems.length}건의 주요 소식을 모아봤습니다.`
-  ];
-  return summaries[Math.floor(Math.random() * summaries.length)];
+// 인덱스 페이지 생성
+function generateIndexPage(reports) {
+  const items = reports
+    .sort((a, b) => b.localeCompare(a))
+    .slice(0, 30)
+    .map(f => {
+      const date = f.replace('report-', '').replace('.html', '');
+      return `<li><a href="reports/${f}">📄 ${date} AI 업계 동향 보고서</a></li>`;
+    })
+    .join('\n');
+
+  return `<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Daily Report Archive</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; max-width: 800px; margin: 60px auto; padding: 20px; }
+    h1 { color: #667eea; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 12px; border-bottom: 1px solid #eee; }
+    a { color: #667eea; text-decoration: none; font-size: 1.05em; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>🤖 AI Daily Report</h1>
+  <p>매일 자동 수집되는 AI 업계 동향 보고서</p>
+  <ul>${items}</ul>
+</body>
+</html>`;
 }
 
-// ======================== 보고서 생성 ========================
-
 async function generateReport() {
-  console.log('\n🚀 AI Industry Daily Report 생성 시작...\n');
-  
-  // 데이터 수집
-  const newsItems = await fetchHackerNewsAI();
-  const papers = await fetchArxivPapers();
-  const repos = await fetchGithubTrending();
-  
-  // HTML 생성
-  const newsHtml = newsItems.map((item, i) => 
-    createNewsItem(item.title, `${item.score} upvotes`, item.url, 'Hacker News')
-  ).join('');
-  
-  const papersHtml = papers.length > 0 
+  console.log('\n🚀 AI 일일 보고서 생성 시작...\n');
+
+  const [newsItems, papers, repos] = await Promise.all([
+    fetchHackerNewsAI(),
+    fetchArxivPapers(),
+    fetchGithubTrending(),
+  ]);
+
+  const newsHtml = newsItems.length > 0
+    ? newsItems.map(item => createNewsItem(item.title, `Hacker News · ${item.score} upvotes`, item.url, 'Hacker News')).join('')
+    : '<div class="empty-state">오늘 AI 관련 뉴스가 없습니다.</div>';
+
+  const papersHtml = papers.length > 0
     ? papers.map(p => createPaperItem(p.title, p.authors, p.abstract, p.url, p.date)).join('')
     : '<div class="empty-state">오늘 추가된 논문이 없습니다.</div>';
-  
-  const reposHtml = repos.map(r => 
-    createRepoItem(r.name, r.url, r.description, r.stars, r.language)
-  ).join('');
-  
-  // 요약 생성
-  const summary = await generateSummary(newsItems);
-  
-  // 날짜 정보
+
+  const reposHtml = repos.length > 0
+    ? repos.map(r => createRepoItem(r.name, r.url, r.description, r.stars, r.language)).join('')
+    : '<div class="empty-state">트렌딩 저장소를 불러올 수 없습니다.</div>';
+
   const now = new Date();
   const dateStr = now.toISOString().split('T')[0];
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const dayOfWeek = days[now.getDay()];
   const timeStr = now.toISOString().split('T')[1].split('.')[0];
-  const dayOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
-  
-  // 템플릿 로드 및 렌더링
+
+  const totalItems = newsItems.length + papers.length + repos.length;
+  const summary = `오늘은 ${newsItems.length}개의 AI 뉴스, ${papers.length}개의 최신 논문, ${repos.length}개의 트렌딩 저장소를 수집했습니다. 총 ${totalItems}개 항목을 확인하세요.`;
+
   const template = fs.readFileSync(path.join(__dirname, 'ai_report_template.html'), 'utf8');
-  
+
   const variables = {
     DATE: dateStr,
     DAY_OF_WEEK: dayOfWeek,
     SUMMARY: summary,
-    NEWS_ITEMS: newsHtml || '<div class="empty-state">뉴스를 불러올 수 없습니다.</div>',
-    MODELS_ITEMS: '<div class="empty-state">오늘 업로드된 새로운 모델이 없습니다.</div>',
-    COMPANY_ITEMS: '<div class="empty-state">기업 뉴스를 업로드 중입니다.</div>',
-    FUNDING_ITEMS: '<div class="empty-state">펀딩 정보를 업로드 중입니다.</div>',
+    NEWS_ITEMS: newsHtml,
+    MODELS_ITEMS: '<div class="empty-state">신규 모델 정보는 뉴스 섹션을 확인하세요.</div>',
+    COMPANY_ITEMS: '<div class="empty-state">기업 뉴스는 뉴스 섹션을 확인하세요.</div>',
+    FUNDING_ITEMS: '<div class="empty-state">펀딩 정보를 수집 중입니다.</div>',
     PAPERS_ITEMS: papersHtml,
     REPOS_ITEMS: reposHtml,
     EVENTS_ITEMS: '<div class="empty-state">예정된 이벤트가 없습니다.</div>',
@@ -227,67 +249,51 @@ async function generateReport() {
     LAST_UPDATE: now.toISOString(),
     GITHUB_REPO_URL: `https://github.com/${CONFIG.github.user}/${CONFIG.github.repo}`
   };
-  
-  const html = renderTemplate(template, variables);
-  
-  // 파일 저장
+
+  let html = template;
+  Object.entries(variables).forEach(([k, v]) => {
+    html = html.replace(new RegExp(`\\{\\{${k}\\}\\}`, 'g'), v);
+  });
+
   const outputDir = CONFIG.output.dir;
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
-  
+  if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+
   const outputPath = path.join(outputDir, CONFIG.output.filename);
   fs.writeFileSync(outputPath, html);
-  
-  console.log(`✅ 보고서 생성 완료: ${outputPath}`);
-  
+  console.log(`\n✅ 보고서 생성: ${outputPath}`);
+
+  // 인덱스 페이지 갱신
+  const reportFiles = fs.readdirSync(outputDir).filter(f => f.endsWith('.html'));
+  fs.writeFileSync('index.html', generateIndexPage(reportFiles));
+  console.log('✅ 인덱스 페이지 갱신');
+
   return outputPath;
 }
 
-// ======================== GitHub 자동화 ========================
-
 async function pushToGithub(reportPath) {
   if (!CONFIG.github.token) {
-    console.warn('⚠️  GITHUB_TOKEN 환경변수가 설정되지 않았습니다.');
+    console.warn('\n⚠️  GITHUB_TOKEN 없음 — 로컬 저장만 완료');
     return;
   }
-  
-  console.log('\n📤 GitHub에 푸시 중...\n');
-  
+  console.log('\n📤 GitHub 푸시 중...');
   try {
-    // Git 설정
-    execSync(`git config user.email "${CONFIG.github.email}"`, { cwd: process.cwd() });
-    execSync(`git config user.name "AI Report Bot"`, { cwd: process.cwd() });
-    
-    // 파일 추가
-    execSync(`git add ${reportPath}`, { cwd: process.cwd() });
-    execSync(`git add reports/`, { cwd: process.cwd() });
-    
-    // 커밋
+    execSync(`git config user.email "${CONFIG.github.email}"`);
+    execSync(`git config user.name "AI Report Bot"`);
+    execSync(`git add reports/ index.html`);
     const date = new Date().toISOString().split('T')[0];
-    execSync(`git commit -m "chore: AI Daily Report for ${date}"`, { cwd: process.cwd() });
-    
-    // 푸시
-    const remoteUrl = `https://${CONFIG.github.user}:${CONFIG.github.token}@github.com/${CONFIG.github.user}/${CONFIG.github.repo}.git`;
-    execSync(`git push ${remoteUrl} main`, { cwd: process.cwd() });
-    
-    console.log('✅ GitHub 푸시 완료!');
-  } catch (error) {
-    console.error('❌ GitHub 푸시 실패:', error.message);
+    execSync(`git commit -m "report: AI Daily Report ${date}"`);
+    const remote = `https://${CONFIG.github.user}:${CONFIG.github.token}@github.com/${CONFIG.github.user}/${CONFIG.github.repo}.git`;
+    execSync(`git push ${remote} main`);
+    console.log('✅ GitHub 푸시 완료');
+  } catch (e) {
+    console.error('❌ 푸시 실패:', e.message);
   }
 }
-
-// ======================== 메인 실행 ========================
 
 async function main() {
-  try {
-    const reportPath = await generateReport();
-    await pushToGithub(reportPath);
-    console.log('\n✨ 완료!\n');
-  } catch (error) {
-    console.error('\n❌ 오류 발생:', error.message);
-    process.exit(1);
-  }
+  const reportPath = await generateReport();
+  await pushToGithub(reportPath);
+  console.log('\n✨ 완료!\n');
 }
 
-main();
+main().catch(e => { console.error(e); process.exit(1); });
