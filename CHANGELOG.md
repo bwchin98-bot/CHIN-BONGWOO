@@ -16,10 +16,10 @@
 - **이유**: v5 actions가 자동으로 Node.js 24 지원
 - **결과**: 더 이상의 deprecation 경고 없음
 
-#### npm 캐시 설정 개선
-- **변경**: `cache: 'npm'` → `cache: false`
+#### npm 캐시 설정 제거
+- **변경**: `cache: 'npm'` → 제거 (cache 옵션 삭제)
 - **이유**: `package-lock.json` 파일이 없어서 발생하는 에러 제거
-- **영향**: 불필요한 의존성 에러 해결
+- **영향**: 불필요한 의존성 에러 해결, v5에서 cache 옵션 불필요
 
 ### 📝 파일 변경사항
 
@@ -39,7 +39,6 @@ env:
 - uses: actions/setup-node@v5
   with:
     node-version: '24'
-    cache: false
 ```
 
 ### 🎯 Issue 해결
@@ -113,6 +112,8 @@ env:
 ### 🔗 관련 커밋
 
 ```
+78a1c01 fix: Remove cache option from setup-node (not supported in v5)
+99ea947 docs: Add CHANGELOG.md for v3.2.0 improvements
 dfa0309 feat: Upgrade skill to v3.2.0 - GitHub Actions v5 and Issue #6 closure
 d25ffe3 fix: Add cache: false and remove FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 (Issue #6)
 086a178 fix: Update GitHub Actions to v5 for Node.js 24 compatibility (Issue #6)
@@ -123,9 +124,9 @@ d25ffe3 fix: Add cache: false and remove FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 (Iss
 | 항목 | 변경 전 | 변경 후 |
 |------|--------|--------|
 | actions/checkout | v4 | v5 |
-| actions/setup-node | v4 | v4 |
+| actions/setup-node | v4 | v5 |
 | Node.js | 24 (강제) | 24 (자동) |
-| npm cache | 'npm' | false |
+| npm cache | 'npm' | (제거) |
 | 환경변수 | FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true | (제거) |
 | 스킬 버전 | 3.1.0 | 3.2.0 |
 | Issue 상태 | 생성 | 완료 |
