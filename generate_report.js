@@ -84,6 +84,8 @@ async function fetchHackerNewsAI() {
   try {
     console.log('📰 Hacker News 수집 중...');
     const topStories = await fetchJson('https://hacker-news.firebaseio.com/v0/topstories.json');
+    console.log(`   [디버그] 총 ${topStories.length}개 상위 스토리 로드`);
+
     const AI_KEYWORDS = ['ai', 'machine learning', 'neural', 'gpt', 'llm', 'transformer',
       'deep learning', 'nlp', 'openai', 'anthropic', 'gemini', 'claude', 'mistral',
       'diffusion', 'reinforcement', 'chatgpt', 'language model', 'stable diffusion'];
@@ -95,18 +97,20 @@ async function fetchHackerNewsAI() {
         if (!story || !story.title) continue;
         const titleLow = story.title.toLowerCase();
         if (AI_KEYWORDS.some(k => titleLow.includes(k))) {
+          console.log(`   ✓ AI 뉴스 발견: ${story.title.substring(0, 50)}`);
           stories.push({
             title: story.title,
             url: story.url || `https://news.ycombinator.com/item?id=${story.id}`,
             score: story.score || 0,
           });
         }
-      } catch (e) { /* skip */ }
+      } catch (e) { console.error(`   [에러] 스토리 ${topStories[i]} 로드 실패:`, e.message); }
     }
-    console.log(`  → ${stories.length}개 수집`);
+    console.log(`  → ${stories.length}개 수집 완료`);
     return stories;
   } catch (e) {
     console.error('❌ HN 오류:', e.message);
+    console.error(e.stack);
     return [];
   }
 }
@@ -115,12 +119,14 @@ async function fetchHackerNewsAI() {
 async function fetchArxivPapers() {
   try {
     console.log('📚 arXiv 논문 수집 중...');
-    const xml = await fetchUrl(
-      'https://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending'
-    );
+    const url = 'https://export.arxiv.org/api/query?search_query=cat:cs.AI+OR+cat:cs.LG+OR+cat:cs.CL&start=0&max_results=5&sortBy=submittedDate&sortOrder=descending';
+    console.log(`   [디버그] URL: ${url}`);
+    const xml = await fetchUrl(url);
+    console.log(`   [디버그] XML 응답 길이: ${xml.length} bytes`);
 
     const papers = [];
     const entries = xml.match(/<entry>([\s\S]*?)<\/entry>/g) || [];
+    console.log(`   [디버그] 항목 수: ${entries.length}`);
 
     for (const entry of entries.slice(0, 5)) {
       const title = (entry.match(/<title>([\s\S]*?)<\/title>/) || [])[1]?.replace(/\s+/g, ' ').trim() || '';
@@ -130,12 +136,16 @@ async function fetchArxivPapers() {
       const authorMatches = entry.match(/<name>([\s\S]*?)<\/name>/g) || [];
       const authors = authorMatches.slice(0, 3).map(a => a.replace(/<\/?name>/g, '').trim()).join(', ');
 
-      if (title) papers.push({ title, abstract, url, date: published, authors });
+      if (title) {
+        console.log(`   ✓ 논문: ${title.substring(0, 50)}`);
+        papers.push({ title, abstract, url, date: published, authors });
+      }
     }
-    console.log(`  → ${papers.length}개 수집`);
+    console.log(`  → ${papers.length}개 수집 완료`);
     return papers;
   } catch (e) {
     console.error('❌ arXiv 오류:', e.message);
+    console.error(e.stack);
     return [];
   }
 }
@@ -144,26 +154,32 @@ async function fetchArxivPapers() {
 async function fetchGithubTrending() {
   try {
     console.log('🔥 GitHub 트렌딩 수집 중...');
-    const headers = CONFIG.github.token
+    const hasToken = !!CONFIG.github.token;
+    console.log(`   [디버그] Token 있음: ${hasToken}`);
+    const headers = hasToken
       ? { Authorization: `token ${CONFIG.github.token}` }
       : {};
 
-    const data = await fetchJson(
-      'https://api.github.com/search/repositories?q=topic:artificial-intelligence+topic:machine-learning&sort=stars&order=desc&per_page=5',
-      headers
-    );
+    const url = 'https://api.github.com/search/repositories?q=topic:artificial-intelligence+topic:machine-learning&sort=stars&order=desc&per_page=5';
+    console.log(`   [디버그] 요청 URL: ${url}`);
+    const data = await fetchJson(url, headers);
+    console.log(`   [디버그] 응답 항목 수: ${(data.items || []).length}`);
 
-    const repos = (data.items || []).slice(0, 5).map(r => ({
-      name: r.full_name,
-      url: r.html_url,
-      description: r.description,
-      stars: r.stargazers_count,
-      language: r.language,
-    }));
-    console.log(`  → ${repos.length}개 수집`);
+    const repos = (data.items || []).slice(0, 5).map(r => {
+      console.log(`   ✓ 저장소: ${r.full_name} (⭐ ${r.stargazers_count})`);
+      return {
+        name: r.full_name,
+        url: r.html_url,
+        description: r.description,
+        stars: r.stargazers_count,
+        language: r.language,
+      };
+    });
+    console.log(`  → ${repos.length}개 수집 완료`);
     return repos;
   } catch (e) {
     console.error('❌ GitHub 오류:', e.message);
+    console.error(e.stack);
     return [];
   }
 }
@@ -291,9 +307,19 @@ async function pushToGithub(reportPath) {
 }
 
 async function main() {
+  console.log('[시작] GitHub 환경 변수 확인:');
+  console.log(`  GITHUB_USER: ${process.env.GITHUB_USER || '(없음)'}`);
+  console.log(`  GITHUB_EMAIL: ${process.env.GITHUB_EMAIL || '(없음)'}`);
+  console.log(`  GITHUB_TOKEN: ${process.env.GITHUB_TOKEN ? '✓ 있음' : '✗ 없음'}`);
+  console.log(`  GITHUB_REPO: ${process.env.GITHUB_REPO || '(없음)'}\n`);
+
   const reportPath = await generateReport();
   await pushToGithub(reportPath);
   console.log('\n✨ 완료!\n');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(e => {
+  console.error('\n❌ 심각한 오류:');
+  console.error(e);
+  process.exit(1);
+});
