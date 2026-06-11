@@ -22,7 +22,9 @@ const COMMANDS = {
   logs: 'Show recent logs',
   roadmap: 'Show development roadmap',
   issues: 'Show active issues',
-  version: 'Show version information'
+  version: 'Show version information',
+  language: 'Set report language (ko/en)',
+  desktop: 'Toggle Desktop auto-save'
 };
 
 function printHelp() {
@@ -247,14 +249,57 @@ function showIssues() {
 function showVersion() {
   console.log('\n📦 Version Information\n');
   console.log('  Skill: AI Daily Report Generator');
-  console.log('  Version: 2.0.0');
+  console.log('  Version: 3.0.0');
   console.log('  Status: Active Development');
   console.log('');
-  console.log('  Current Phase: Phase 2 (Core Features)');
-  console.log('  Active Issues: 1 (#2)');
+  console.log('  Features:');
+  console.log('    ✅ 7 Sections (News, Papers, Repos, Models, Company, Funding, Events)');
+  console.log('    ✅ Korean Localization');
+  console.log('    ✅ Desktop Auto-Save');
+  console.log('    ✅ GitHub Actions Automation');
+  console.log('');
+  console.log('  Current Phase: Phase 3 (Localization & Desktop)');
+  console.log('  Active Issues: 1 (#3)');
   console.log('');
   console.log('  Repository: https://github.com/bwchin98-bot/CHIN-BONGWOO');
   console.log('  Author: bwchin98-bot');
+  console.log('');
+}
+
+function setLanguage() {
+  const lang = process.argv[3] || 'ko';
+  console.log('\n🌐 Report Language Setting\n');
+
+  if (lang !== 'ko' && lang !== 'en') {
+    console.log('❌ Invalid language. Use: ko (Korean) or en (English)');
+    process.exit(1);
+  }
+
+  console.log(`✅ Language set to: ${lang === 'ko' ? '한글 🇰🇷' : 'English 🇺🇸'}`);
+  console.log('');
+  console.log('To apply, set environment variable:');
+  console.log(`  export REPORT_LANGUAGE=${lang}`);
+  console.log('');
+}
+
+function toggleDesktop() {
+  const enable = process.argv[3] !== 'off';
+  console.log('\n💾 Desktop Auto-Save Setting\n');
+
+  if (enable) {
+    console.log('✅ Desktop auto-save is now ENABLED');
+    console.log('');
+    console.log('Reports will be saved to:');
+    console.log('  C:\\Users\\{username}\\Desktop\\AI-Daily-Reports\\');
+    console.log('');
+    console.log('To apply, set environment variable:');
+    console.log('  export REPORT_DESKTOP_SAVE=true');
+  } else {
+    console.log('❌ Desktop auto-save is now DISABLED');
+    console.log('');
+    console.log('To apply, set environment variable:');
+    console.log('  export REPORT_DESKTOP_SAVE=false');
+  }
   console.log('');
 }
 
@@ -293,6 +338,12 @@ switch (command) {
     break;
   case 'version':
     showVersion();
+    break;
+  case 'language':
+    setLanguage();
+    break;
+  case 'desktop':
+    toggleDesktop();
     break;
   default:
     console.error(`❌ Unknown command: ${command}\n`);

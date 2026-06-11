@@ -1,7 +1,7 @@
 name: ai-daily-report
 displayName: AI Daily Report Generator
-description: Automated daily AI industry reports with GitHub Actions integration
-version: 2.0.0
+description: Automated daily AI industry reports with Korean localization and Desktop auto-save
+version: 3.0.0
 author: bwchin98-bot
 repository: https://github.com/bwchin98-bot/CHIN-BONGWOO
 

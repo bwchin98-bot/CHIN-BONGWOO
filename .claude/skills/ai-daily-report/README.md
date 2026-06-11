@@ -8,16 +8,16 @@
 - **📰 Breaking News**: Hacker News에서 AI 관련 뉴스 5개 자동 수집
 - **📚 Research Papers**: arXiv에서 최신 AI 논문 5개 자동 수집
 - **🔥 Trending Repos**: GitHub에서 트렌딩 AI 저장소 5개 자동 수집
+- **💼 Company Updates**: 기업 뉴스 자동 필터링 (OpenAI, Anthropic 등)
+- **💰 Funding & Investments**: AI 펀딩 정보 자동 수집
+- **🤖 New Models & Technologies**: Hugging Face에서 최신 모델 수집
+- **📅 Upcoming Events**: 주요 AI 컨퍼런스 일정 자동 추가
 - **📊 HTML Report**: 반응형 HTML 형식의 전문적인 보고서 생성
+- **🌐 한글 지원**: 100% 한글로 번역된 보고서 생성
+- **💾 Desktop 자동 저장**: `Desktop/AI-Daily-Reports/` 폴더에 자동 저장
 - **🔄 자동 푸시**: GitHub에 자동으로 커밋 및 푸시
 - **📑 아카이브**: 과거 보고서 목록 자동 생성
 - **⏰ 자동화**: GitHub Actions로 매일 자동 실행
-
-### ⏳ 개발 중 (Issue #2 참조)
-- **💼 Company Updates**: 대형 AI 기업 뉴스 수집
-- **💰 Funding & Investments**: AI 스타트업 펀딩 정보
-- **🤖 New Models & Technologies**: 최신 AI 모델 출시 정보
-- **📅 Upcoming Events**: AI 컨퍼런스 일정
 
 ## 🚀 빠른 시작
 
@@ -68,13 +68,26 @@
 ### 필수
 - **GitHub 계정**: 저장소에 쓰기 권한
 - **Personal Access Token**: `repo`, `workflow` 권한
-- **Node.js 18+**: GitHub Actions 환경에서 자동 설치
+- **Node.js 24+**: GitHub Actions 환경에서 자동 설치
 
-### 선택
-- **API Keys**: (향후 확장용)
-  - Google News API
-  - Product Hunt API
-  - Crunchbase API
+### 선택 (환경변수)
+```bash
+# 언어 설정 (한글/영문)
+REPORT_LANGUAGE=ko    # 'ko' (한글) 또는 'en' (영문)
+
+# Desktop 저장
+REPORT_DESKTOP_SAVE=true   # Desktop에 자동 저장 여부
+
+# 저장 위치 커스터마이징
+REPORT_SAVE_LOCATION=/custom/path
+```
+
+### Desktop 저장 위치
+```
+Windows: C:\Users\{username}\Desktop\AI-Daily-Reports\
+macOS: /Users/{username}/Desktop/AI-Daily-Reports/
+Linux: ~/Desktop/AI-Daily-Reports/
+```
 
 ## 📊 보고서 구조
 
