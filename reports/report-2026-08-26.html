@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 업계 일일 동향 보고서 - 2026-08-26</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        header .date {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .summary {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+        
+        .summary h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .summary p {
+            font-size: 1.05em;
+            line-height: 1.8;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2::before {
+            font-size: 1.5em;
+        }
+        
+        .news-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #764ba2;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .news-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .news-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        .news-item p {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        
+        .news-item a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .news-item a:hover {
+            text-decoration: underline;
+        }
+        
+        .source {
+            color: #999;
+            font-size: 0.85em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .paper-item {
+            background: #f0f4ff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .paper-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.05em;
+        }
+        
+        .paper-item .authors {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            font-style: italic;
+        }
+        
+        .paper-item p {
+            color: #555;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .repo-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #764ba2;
+        }
+        
+        .repo-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .repo-item .stats {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #666;
+        }
+        
+        .stat strong {
+            color: #667eea;
+        }
+        
+        footer {
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            padding: 30px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+            
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section h2 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🤖 AI 업계 일일 동향 보고서</h1>
+            <div class="date">2026-08-26 | 수요일</div>
+        </header>
+        
+        <div class="content">
+            <!-- Executive Summary -->
+            <div class="summary">
+                <h2>📊 오늘의 요약</h2>
+                <p>오늘은 5개 AI 뉴스, 3개 기업 뉴스, 3개 펀딩 소식, 5개 신규 모델, 5개 논문, 5개 트렌딩 저장소, 5개 행사를 수집했습니다. 총 31개 항목입니다.</p>
+            </div>
+            
+            <!-- Breaking News -->
+            <div class="section">
+                <h2>🔥 주요 뉴스</h2>
+                <div id="news">
+                    <div class="news-item">
+    <h3><a href="https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia" target="_blank" style="color:#333;text-decoration:none;">OpenAI Jalapeño: Better than Nvidia Blackwell</a></h3>
+    <p style="font-size:0.9em;color:#666;">483 upvotes</p>
+    <a href="https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div><div class="news-item">
+    <h3><a href="https://github.com/runetes/maiao" target="_blank" style="color:#333;text-decoration:none;">Maiao: Gerrit-style code review workflow for GitHub, GitLab, Gitea, others</a></h3>
+    <p style="font-size:0.9em;color:#666;">81 upvotes</p>
+    <a href="https://github.com/runetes/maiao" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div><div class="news-item">
+    <h3><a href="https://openai.com/index/disrupting-malicious-uses-of-ai-influence-campaign-russia/" target="_blank" style="color:#333;text-decoration:none;">Disrupting a new covert influence campaign from Russia</a></h3>
+    <p style="font-size:0.9em;color:#666;">49 upvotes</p>
+    <a href="https://openai.com/index/disrupting-malicious-uses-of-ai-influence-campaign-russia/" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div><div class="news-item">
+    <h3><a href="https://www.ycombinator.com/companies/clara-2/jobs/8snci6k-founding-full-stack-growth-engineer" target="_blank" style="color:#333;text-decoration:none;">Clara (YC P26) is hiring a growth engineer to bring AI doctors to market</a></h3>
+    <p style="font-size:0.9em;color:#666;">1 upvotes</p>
+    <a href="https://www.ycombinator.com/companies/clara-2/jobs/8snci6k-founding-full-stack-growth-engineer" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div><div class="news-item">
+    <h3><a href="http://alessandrorosa.altervista.org/pages/my.anti.ai.manifesto.html" target="_blank" style="color:#333;text-decoration:none;">My Anti-AI Manifesto</a></h3>
+    <p style="font-size:0.9em;color:#666;">5 upvotes</p>
+    <a href="http://alessandrorosa.altervista.org/pages/my.anti.ai.manifesto.html" target="_blank" style="font-size:0.9em;">자세히 보기 →</a>
+  </div>
+                </div>
+            </div>
+            
+            <!-- New Models & Technologies -->
+            <div class="section">
+                <h2>🤖 신규 모델 & 기술</h2>
+                <div id="models">
+                    <div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="https://huggingface.co/deepseek-ai/DeepSeek-R1" target="_blank" style="text-decoration:none;">deepseek-ai/DeepSeek-R1</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">❤️ 13,587 | 📥 4,431,386</div>
+  </div><div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct" target="_blank" style="text-decoration:none;">meta-llama/Llama-3.1-8B-Instruct</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">❤️ 6,672 | 📥 6,375,575</div>
+  </div><div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="https://huggingface.co/meta-llama/Meta-Llama-3-8B" target="_blank" style="text-decoration:none;">meta-llama/Meta-Llama-3-8B</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">❤️ 6,633 | 📥 1,188,242</div>
+  </div><div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Pro" target="_blank" style="text-decoration:none;">deepseek-ai/DeepSeek-V4-Pro</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">❤️ 5,482 | 📥 980,375</div>
+  </div><div class="repo-item" style="padding:12px;">
+    <h4 style="margin:0;color:#667eea;"><a href="https://huggingface.co/openai/gpt-oss-120b" target="_blank" style="text-decoration:none;">openai/gpt-oss-120b</a></h4>
+    <div style="font-size:0.85em;color:#666;margin-top:4px;">❤️ 5,125 | 📥 5,222,602</div>
+  </div>
+                </div>
+            </div>
+            
+            <!-- Company Updates -->
+            <div class="section">
+                <h2>💼 기업 뉴스</h2>
+                <div id="companies">
+                    <div class="news-item">
+    <h3><a href="https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia" target="_blank" style="color:#333;text-decoration:none;">[OPENAI] OpenAI Jalapeño: Better than Nvidia Blackwell</a></h3>
+    <p>Hacker News · 483 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://newsletter.semianalysis.com/p/openai-jalapeno-better-than-nvidia" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Company News</div>
+    </div>
+  </div><div class="news-item">
+    <h3><a href="https://alexkras.com/focus-is-the-main-feature-why-i-miss-the-old-claude-code/" target="_blank" style="color:#333;text-decoration:none;">[CLAUDE] I miss the old Claude Code</a></h3>
+    <p>Hacker News · 24 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://alexkras.com/focus-is-the-main-feature-why-i-miss-the-old-claude-code/" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Company News</div>
+    </div>
+  </div><div class="news-item">
+    <h3><a href="https://www.ft.com/content/5ee49718-c258-4f01-aa32-7e5b76ae5245" target="_blank" style="color:#333;text-decoration:none;">[ANTHROPIC] Anthropic&#039;s best AI model struggles to attract users as cheaper tools thrive</a></h3>
+    <p>Hacker News · 812 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://www.ft.com/content/5ee49718-c258-4f01-aa32-7e5b76ae5245" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Company News</div>
+    </div>
+  </div>
+                </div>
+            </div>
+            
+            <!-- Funding -->
+            <div class="section">
+                <h2>💰 펀딩 & 투자</h2>
+                <div id="funding">
+                    <div class="news-item">
+    <h3><a href="https://nil.wallyjones.com/run-openbsd-on-digitalocean-for-4month/" target="_blank" style="color:#333;text-decoration:none;">Run OpenBSD on DigitalOcean for $4/month</a></h3>
+    <p>Hacker News · 165 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://nil.wallyjones.com/run-openbsd-on-digitalocean-for-4month/" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Funding News</div>
+    </div>
+  </div><div class="news-item">
+    <h3><a href="https://www.library.hbs.edu/working-knowledge/how-credit-card-rewards-became-multibillion-dollar-wealth-transfer" target="_blank" style="color:#333;text-decoration:none;">How credit card rewards became a $9.2B wealth transfer</a></h3>
+    <p>Hacker News · 175 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://www.library.hbs.edu/working-knowledge/how-credit-card-rewards-became-multibillion-dollar-wealth-transfer" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Funding News</div>
+    </div>
+  </div><div class="news-item">
+    <h3><a href="https://www.reuters.com/world/middle-east/us-removes-syrias-designation-state-sponsor-terrorism-2026-08-24/" target="_blank" style="color:#333;text-decoration:none;">US removes Syria from terrorism sponsor list, lifting major investment obstacle</a></h3>
+    <p>Hacker News · 14 upvotes</p>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;">
+      <a href="https://www.reuters.com/world/middle-east/us-removes-syrias-designation-state-sponsor-terrorism-2026-08-24/" target="_blank">자세히 보기 →</a>
+      <div class="source">출처: Funding News</div>
+    </div>
+  </div>
+                </div>
+            </div>
+            
+            <!-- Research Papers -->
+            <div class="section">
+                <h2>📄 주목할 논문</h2>
+                <div id="papers">
+                    <div class="paper-item">
+    <h3>What FID Hides: Detecting, Ranking, and Diagnosing Deviations in Generative Evaluation</h3>
+    <div class="authors">Hao Chen</div>
+    <p>Generative models are commonly ranked by Fréchet Inception Distance (FID) and Kernel Inception Distance (KID), yet FID&#039;s first-two-moment summary can miss distributional differences, and a reported scalar gap alone is not a calibrated test against sa...</p>
+    <div class="tags">
+      <span class="tag">2026-08-25</span>
+      <a href="http://arxiv.org/abs/2608.24881v1" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div><div class="paper-item">
+    <h3>Recursive Experiential-Working Memory Evolution for Long-Horizon Agent Harnesses</h3>
+    <div class="authors">Zhaochen Yu, Yingcheng Wu, Zhenfei Yin</div>
+    <p>Recursive self-improvement (RSI) remains hard in long-horizon tasks, where growing histories obscure the task state and misalign skill invocation. We introduce Recuris, a recursive Experiential-Working Memory architecture for long-horizon agent harne...</p>
+    <div class="tags">
+      <span class="tag">2026-08-25</span>
+      <a href="http://arxiv.org/abs/2608.24876v1" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div><div class="paper-item">
+    <h3>SPO++: Stream-Aligned Policy Optimization for Asynchronous Agentic RL</h3>
+    <div class="authors">Kai Ruan, Jinghao Lin, Qianshan Wei</div>
+    <p>Group-relative reinforcement learning waits for sibling rollouts of the same prompt, which is costly for long and variable tool-use trajectories. Single-stream Policy Optimization (SPO) removes this dependency with a persistent prompt-level value est...</p>
+    <div class="tags">
+      <span class="tag">2026-08-25</span>
+      <a href="http://arxiv.org/abs/2608.24870v1" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div><div class="paper-item">
+    <h3>Parameterized Complexity of $L_p$-Lipschitz Constants for Input Convex Neural Networks and $L_p$-Norm Maximization over Zonotopes</h3>
+    <div class="authors">Aritra Das, Vincent Froese, Moritz Grillo</div>
+    <p>Lipschitz constants are a standard way to quantify the sensitivity of neural networks to small input perturbations, but computing them is difficult even for shallow ReLU networks. We study this problem for two-layer input-convex neural networks (ICNN...</p>
+    <div class="tags">
+      <span class="tag">2026-08-25</span>
+      <a href="http://arxiv.org/abs/2608.24865v1" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div><div class="paper-item">
+    <h3>Improving Cross-Problem Vehicle Routing with Locally Augmented Preferences and Representation Disentanglement</h3>
+    <div class="authors">Arthur Corrêa, Paulo Nascimento, Samuel Moniz</div>
+    <p>Multi-task vehicle routing problem (VRP) solvers seek to handle multiple VRP variants within a single unified model, avoiding the need to train a separate model for every variant. In spite of recent progress, current approaches remain limited on two ...</p>
+    <div class="tags">
+      <span class="tag">2026-08-25</span>
+      <a href="http://arxiv.org/abs/2608.24859v1" target="_blank" style="color:#667eea;font-weight:600;">논문 보기 →</a>
+    </div>
+  </div>
+                </div>
+            </div>
+            
+            <!-- GitHub Trending -->
+            <div class="section">
+                <h2>🔥 트렌딩 저장소</h2>
+                <div id="repos">
+                    <div class="repo-item">
+    <h3><a href="https://github.com/f/prompts.chat" target="_blank" style="color:#667eea;text-decoration:none;">f/prompts.chat</a></h3>
+    <p>f.k.a. Awesome ChatGPT Prompts. Share, discover, and collect prompts from the community. Free and open source — self-host for your organization with complete privacy.</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>167,923</strong> stars</div>
+      <div class="stat">📝 <strong>HTML</strong></div>
+    </div>
+  </div><div class="repo-item">
+    <h3><a href="https://github.com/rasbt/LLMs-from-scratch" target="_blank" style="color:#667eea;text-decoration:none;">rasbt/LLMs-from-scratch</a></h3>
+    <p>Implement a ChatGPT-like LLM in PyTorch from scratch, step by step</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>103,815</strong> stars</div>
+      <div class="stat">📝 <strong>Jupyter Notebook</strong></div>
+    </div>
+  </div><div class="repo-item">
+    <h3><a href="https://github.com/microsoft/AI-For-Beginners" target="_blank" style="color:#667eea;text-decoration:none;">microsoft/AI-For-Beginners</a></h3>
+    <p>12 Weeks, 24 Lessons, AI for All!</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>67,046</strong> stars</div>
+      <div class="stat">📝 <strong>Jupyter Notebook</strong></div>
+    </div>
+  </div><div class="repo-item">
+    <h3><a href="https://github.com/ashishpatel26/500-AI-Machine-learning-Deep-learning-Computer-vision-NLP-Projects-with-code" target="_blank" style="color:#667eea;text-decoration:none;">ashishpatel26/500-AI-Machine-learning-Deep-learning-Computer-vision-NLP-Projects-with-code</a></h3>
+    <p>500 AI Machine learning Deep learning Computer vision NLP Projects with code</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>36,545</strong> stars</div>
+      
+    </div>
+  </div><div class="repo-item">
+    <h3><a href="https://github.com/ItzCrazyKns/Vane" target="_blank" style="color:#667eea;text-decoration:none;">ItzCrazyKns/Vane</a></h3>
+    <p>Vane is an AI-powered answering engine.</p>
+    <div class="stats">
+      <div class="stat">⭐ <strong>36,478</strong> stars</div>
+      <div class="stat">📝 <strong>TypeScript</strong></div>
+    </div>
+  </div>
+                </div>
+            </div>
+            
+            <!-- Events -->
+            <div class="section">
+                <h2>📅 예정된 행사</h2>
+                <div id="events">
+                    <div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="https://nips.cc/" target="_blank" style="text-decoration:none;color:#333;">NeurIPS 2026</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 2026-12-09 | 📍 Vancouver, Canada</p>
+  </div><div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="https://icml.cc/" target="_blank" style="text-decoration:none;color:#333;">ICML 2026</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 2026-07-23 | 📍 Vienna, Austria</p>
+  </div><div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="https://cvpr2026.thecvf.com/" target="_blank" style="text-decoration:none;color:#333;">CVPR 2026</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 2026-06-18 | 📍 New York, USA</p>
+  </div><div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="https://2026.aclweb.org/" target="_blank" style="text-decoration:none;color:#333;">ACL 2026</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 2026-08-09 | 📍 Mexico City, Mexico</p>
+  </div><div class="news-item" style="padding:12px;">
+    <h4 style="margin:0;"><a href="https://iccv2026.org/" target="_blank" style="text-decoration:none;color:#333;">ICCV 2026</a></h4>
+    <p style="font-size:0.85em;margin:4px 0;color:#666;">📅 2026-10-11 | 📍 Paris, France</p>
+  </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>생성일: 2026-08-26 09:47:18 UTC</p>
+            <p>📍 <a href="https://github.com/bwchin98-bot/CHIN-BONGWOO">GitHub에서 보기</a> | 최종 업데이트: 2026-08-26T09:47:18.788Z</p>
+        </footer>
+    </div>
+</body>
+</html>
